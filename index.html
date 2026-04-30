@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stacy_top3 — Item Received</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #090c10;
+    --surface:   #0f1318;
+    --surface2:  #151b22;
+    --border:    rgba(255,255,255,0.07);
+    --border2:   rgba(255,255,255,0.12);
+    --accent:    #5b8cff;
+    --accent2:   #8fb4ff;
+    --pink:      #ff5e8a;
+    --pink-dim:  rgba(255,94,138,0.15);
+    --text:      #e8ecf2;
+    --text-muted:#5a6475;
+    --text-dim:  #8892a4;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  .bg-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .bg-layer::before {
+    content: '';
+    position: absolute;
+    top: -200px; left: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(91,140,255,0.07) 0%, transparent 65%);
+  }
+  .bg-layer::after {
+    content: '';
+    position: absolute;
+    bottom: -200px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(255,94,138,0.06) 0%, transparent 65%);
+  }
+
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px
+    );
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+  }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeIn 0.6s ease both;
+  }
+  .eyebrow-line {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border2));
+  }
+  .eyebrow-line.right {
+    background: linear-gradient(90deg, var(--border2), transparent);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.03),
+      0 40px 80px rgba(0,0,0,0.6),
+      0 0 60px rgba(91,140,255,0.04);
+    animation: rise 0.8s cubic-bezier(0.22,1,0.36,1) 0.15s both;
+  }
+
+  .card-bar {
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%, var(--accent) 25%,
+      var(--pink) 55%, var(--accent) 80%, transparent 100%);
+    opacity: 0.7;
+  }
+
+  .card-inner {
+    padding: 44px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .avatar-wrap {
+    position: relative;
+    margin-bottom: 24px;
+    animation: fadeDown 0.7s ease 0.4s both;
+  }
+  .avatar-outer {
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--pink));
+    padding: 2px;
+    box-shadow: 0 0 30px rgba(91,140,255,0.25), 0 0 60px rgba(255,94,138,0.1);
+  }
+  .avatar-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--surface2);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+  }
+  .avatar-fallback {
+    display: none;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+  .avatar-fallback svg { width: 40px; height: 40px; opacity: 0.25; }
+
+  .username {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    animation: fadeDown 0.6s ease 0.55s both;
+  }
+  .user-handle {
+    font-family: 'Space Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+    animation: fadeDown 0.6s ease 0.62s both;
+  }
+
+  .sep {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 32px;
+    position: relative;
+    animation: fadeIn 0.5s ease 0.7s both;
+  }
+  .sep::after {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px; height: 5px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .received-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    animation: fadeIn 0.5s ease 0.78s both;
+  }
+  .received-headline {
+    font-family: 'Syne', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-align: center;
+    margin-bottom: 36px;
+    line-height: 1.4;
+    animation: fadeIn 0.5s ease 0.84s both;
+  }
+  .received-headline strong {
+    color: var(--text);
+    display: block;
+    font-size: 22px;
+  }
+
+  .item-box {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+    animation: rise 0.7s cubic-bezier(0.22,1,0.36,1) 0.95s both;
+  }
+  .item-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,94,138,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .item-box-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--pink), transparent);
+    opacity: 0.5;
+  }
+
+  .item-img-container {
+    width: 140px;
+    height: 140px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    animation: float 4s ease-in-out 1.5s infinite;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255,94,138,0.08);
+  }
+  .item-img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 8px 20px rgba(255,94,138,0.3));
+  }
+  .item-fallback {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+  }
+  .item-fallback svg { width: 36px; height: 36px; opacity: 0.25; }
+  .item-fallback span {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .item-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    text-align: center;
+  }
+  .item-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+
+  color: #FFD700; /* bright gold */
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.45);
+
+  border-radius: 100px;
+  padding: 5px 14px;
+
+  /* glow effect */
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.6),
+              0 0 12px rgba(255, 215, 0, 0.4);
+
+  text-shadow: 0 0 4px rgba(255, 215, 0, 0.8),
+               0 0 8px rgba(255, 215, 0, 0.6);
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px 40px 32px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+    animation: fadeIn 0.5s ease 1.2s both;
+  }
+ .footer-left {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  color: #FF4D4D; /* softer red, not pure #FF0000 */
+
+  text-shadow:
+    0 0 4px rgba(255, 77, 77, 0.9),
+    0 0 8px rgba(255, 77, 77, 0.6),
+    0 0 12px rgba(255, 77, 77, 0.4);
+}
+  .footer-right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+
+  color: #00FF7F;
+
+  text-shadow:
+    0 0 4px rgba(0, 255, 127, 0.9),
+    0 0 8px rgba(0, 255, 127, 0.6),
+    0 0 12px rgba(0, 255, 127, 0.4);
+}
+  .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+
+  background: #00FF7F; /* bright green core */
+
+  box-shadow:
+    0 0 4px rgba(0, 255, 127, 0.9),
+    0 0 8px rgba(0, 255, 127, 0.7),
+    0 0 12px rgba(0, 255, 127, 0.5);
+
+  animation: blink 2s ease-in-out infinite;
+}
+
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-8px); }
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer"></div>
+<div class="scanlines"></div>
+
+<div class="page">
+
+  <div class="card">
+    <div class="card-bar"></div>
+    <div class="card-inner">
+
+      <div class="avatar-wrap">
+        <div class="avatar-outer">
+          <div class="avatar-inner">
+            <img class="avatar-img" id="avatarImg"
+              src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-5FD0094BC9ABC5A95897159E388DD162-Png/420/420/AvatarHeadshot/Png/noFilter"
+              alt="Stacy_top3">
+            <div class="avatar-fallback" id="avatarFallback">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="8" r="4" stroke="white" stroke-width="1.5"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="username">Stacy_top3</div>
+      <div class="user-handle">Player Profile</div>
+      <div class="sep"></div>
+
+      <div class="received-label">Item Received</div>
+      <div class="received-headline">
+        This player has received<br>
+        <strong>Strawberry Elephant</strong>
+      </div>
+
+      <div class="item-box">
+        <div class="item-box-bar"></div>
+        <div class="item-img-container">
+          <img class="item-img" id="itemImg"
+            src="https://static.wikia.nocookie.net/stealabr/images/5/58/Strawberryelephant.png/revision/latest?cb=20260317001745"
+            alt="Strawberry Elephant">
+          <div class="item-fallback" id="itemFallback">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="1.5"/>
+              <path d="M3 15l5-5 4 4 3-3 6 6" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>Image unavailable</span>
+          </div>
+        </div>
+        <div class="item-name">Strawberry Elephant</div>
+        <div class="item-tag">OG Item</div>
+      </div>
+
+    </div>
+
+    <div class="card-footer">
+      <div class="footer-left">April 2026</div>
+      <div class="footer-right">
+        <div class="status-dot"></div>
+        Confirmed
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('avatarImg').onerror = function() {
+    this.style.display = 'none';
+    document.getElementById('avatarFallback').style.display = 'flex';
+  };
+  document.getElementById('itemImg').onerror = function() {
+    this.style.display = 'none';
+    document.getElementById('itemFallback').style.display = 'flex';
+  };
+</script>
+</body>
+</html>
